@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Fire Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+
+<body>
+    <table cellspacing="20" width="90%" border="1">
+        <tr>
+            <td>
+                <textarea id="source" placeholder="message for public wall" style="width:50%; height: 100%;"></textarea>
+                <input id="btnPost" type="button" value="Post" />
+            </td>
+            <td style="text-align: right">
+                <span id="user">
+                    <button onclick="login()">Login</button>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h4>Public Wall</h4>
+                <h1 id="publicWall">Loading..</h1>
+            </td>
+            
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center; background-color:green; color: white;">
+                <h3>Notes</h3>
+            </td>
+        </tr>
+    </table>
+
+
+    <table cellspacing="20" width="90%" border="1">
+        <tr>
+            <td>
+                Pick a date <input type="date" id="noteDate" />
+            </td>
+            <td rowspan="3" style="background-color:gold; overflow-y: scroll;">
+                <ol id="lstNotes">
+                    
+                </ol>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Enter Notes <textarea id="noteText" placeholder="Enter notes"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="button" id="btnCreateNote" value="Create Note" />      
+            </td>
+        </tr>
+
+    </table>
+
+
+    <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+    <script src="scripts/FirebaseDriver.js"></script>
+    <script src="scripts/script.js"></script>
+    <script>
+
+
+        // App Code
+        var publicWall = document.getElementById("publicWall");
+
+
+        // On change of a value from Firebase DB, we put the value into DOM (asynchronous)
+        var dbRef = firebase.database().ref().child('userVal').child('text');
+        dbRef.on('value', col => publicWall.innerText = col.val());
+
+        var btnPost = document.getElementById("btnPost");
+        var source = document.getElementById("source");
+
+        // Setting value to Firebase DB on click of a button
+        btnPost.onclick = function () {
+            firebase.database().ref().set({
+                //userVal: source.value
+                userVal: { text: source.value, type: "string" },
+                list: ['abc', 'def', 'ghi']
+            });
+
+            console.log(firebase.auth().currentUser);
+        };
+    </script>
+
+</body>
+
+</html>
