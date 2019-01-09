@@ -1,28 +1,37 @@
-// public 
-
+// Firebase objects
 this.database = firebase.database();
-let notesRef = this.database.ref("notes")
+let notesRef = this.database.ref("notes");
+
+// UI Objects
+var noteDate = document.getElementById("noteDate");
+var noteText = document.getElementById("noteText");
 
 function saveUpdateNote(note){
     notesRef.child(note.id).set(note)
 }
 
-function createNoteObj(noteDate, noteText){
+function createNoteObj(noteDateVal, noteTextVal){
     return {
         id: Date.now(),
-        date: noteDate,
-        text: noteText
+        date: noteDateVal,
+        text: noteTextVal
     }
+}
+
+function clearInputs(){
+    noteDate.value = "";
+    noteText.value = "";
 }
 
 function createNote(){
     //alert("creatig new note..")
-    var noteDate = document.getElementById("noteDate").value;
-    var noteText = document.getElementById("noteText").value;
-    var noteObj = createNoteObj(noteDate, noteText);
+    //var noteDate = document.getElementById("noteDate").value;
+    //var noteText = document.getElementById("noteText").value;
+    var noteObj = createNoteObj(noteDate.value, noteText.value);
     saveUpdateNote(noteObj);
     updateNotesList();
-    alert("Note created!")
+    clearInputs();
+    alert("New note created!")
 }
 
 document.getElementById("btnCreateNote").onclick = createNote;
@@ -30,6 +39,9 @@ document.getElementById("btnCreateNote").onclick = createNote;
 function updateNotesList(){
     
     var lst = document.getElementById("lstNotes");
+    while (lst.firstChild) {
+        lst.removeChild(lst.firstChild);
+    }
     notesRef.on('value', function(notes){
         notes.forEach(function(note){
             
