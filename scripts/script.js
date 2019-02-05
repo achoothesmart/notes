@@ -1,56 +1,55 @@
 // Firebase objects
 this.database = firebase.database();
-let notesRef = this.database.ref("notes");
+let contactsRef = this.database.ref("contacts");
 
 // UI Objects
-var noteDate = document.getElementById("noteDate");
-var noteText = document.getElementById("noteText");
+var txtName = document.getElementById("txtName");
+var txtMobile = document.getElementById("txtMobile");
 
-function saveUpdateNote(note){
-    notesRef.child(note.id).set(note)
+function saveUpdateContact(contact){
+    contactsRef.child(contact.id).set(contact)
 }
 
-function createNoteObj(noteDateVal, noteTextVal){
+function createContactObj(nameVal, mobileVal){
     return {
         id: Date.now(),
-        date: noteDateVal,
-        text: noteTextVal
+        name: nameVal,
+        mobile: mobileVal
     }
 }
 
 function clearInputs(){
-    noteDate.value = "";
-    noteText.value = "";
+    txtName.value = "";
+    txtMobile.value = "";
 }
 
-function createNote(){
+function addContact(){
     //alert("creatig new note..")
-    //var noteDate = document.getElementById("noteDate").value;
-    //var noteText = document.getElementById("noteText").value;
-    var noteObj = createNoteObj(noteDate.value, noteText.value);
-    saveUpdateNote(noteObj);
-    updateNotesList();
+    
+    var contactObj = createContactObj(txtName.value, txtMobile.value);
+    saveUpdateContact(contactObj);
+    updateContactsList();
     clearInputs();
-    alert("New note created!")
+    alert("New Contact created!")
 }
 
-document.getElementById("btnCreateNote").onclick = createNote;
+document.getElementById("btnAdd").onclick = addContact;
 
-function updateNotesList(){
+function updateContactsList(){
     
-    var lst = document.getElementById("lstNotes");
+    var lst = document.getElementById("lstContacts");
     while (lst.firstChild) {
         lst.removeChild(lst.firstChild);
     }
-    notesRef.on('value', function(notes){
-        notes.forEach(function(note){
+    contactsRef.on('value', function(contacts){
+        contacts.forEach(function(contact){
             
             var li = document.createElement("li");
-            li.appendChild(document.createTextNode(note.val().date + " > " + note.val().text));
+            li.appendChild(document.createTextNode(contact.val().name + ", " + contact.val().mobile));
             lst.appendChild(li);
         });
     });
     
 }
 
-updateNotesList();
+updateContactsList();
