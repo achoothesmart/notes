@@ -3,11 +3,17 @@ this.database = firebase.database();
 let contactsRef = this.database.ref("contacts");
 
 // UI Objects 
+
+var btnLogin = document.getElementById("btnLogin");
+var txtPassword = document.getElementById("txtPassword");
+
 var txtName = document.getElementById("txtName");
 var txtMobile = document.getElementById("txtMobile");
+var txtAddress = document.getElementById("txtAddress");
 var lnkUpdate = document.getElementById("lnkUpdate");
 var lblUpdatedStatus = document.getElementById("lblUpdatedStatus");
 var lblUpdateAlert = document.getElementById("lblUpdateAlert");
+
 
 
 // Gobals
@@ -15,42 +21,53 @@ var updatedContacts = {}
 var firstRefreshOver = false;
 
 function saveUpdateContact(contact){
-    contactsRef.child(contact.id).set(contact)
-}
-
-function deleteAllContacts(){
-    var res = confirm("Do you want to delete all Contacts?");
-    if(res){
-        contactsRef.set({});
-        updateContactsList();
+    if(checkEmptyString(contact.name) || checkEmptyString(contact.mobile) || checkEmptyString(contact.address)){
+        alert("Complete all the fields");
+        return false;
+    }
+    else{
+        contactsRef.child(contact.id).set(contact);
+        return true;
     }
 }
 
-function deleteContact(contact_id){
-    contactsRef.child(contact_id).set({})
-}
+// function deleteAllContacts(){
+//     var res = confirm("Do you want to delete all Contacts?");
+//     if(res){
+//         contactsRef.set({});
+//         updateContactsList();
+//     }
+// }
 
-function createContactObj(nameVal, mobileVal){
+// function deleteContact(contact_id){
+//     contactsRef.child(contact_id).set({})
+// }
+
+function createContactObj(nameVal, mobileVal, addrVal){
     return {
         id: Date.now(),
         name: nameVal,
-        mobile: mobileVal
+        mobile: mobileVal,
+        address: addrVal
     }
 }
 
 function clearInputs(){
     txtName.value = "";
     txtMobile.value = "";
+    txtAddress.value = "";
 }
 
 function addContact(){
     //alert("creatig new note..")
     
-    var contactObj = createContactObj(txtName.value, txtMobile.value);
-    saveUpdateContact(contactObj);
-    updateContactsList();
-    clearInputs();
-    alert("New Contact created!")
+    var contactObj = createContactObj(txtName.value, txtMobile.value, txtAddress.value);
+    if (saveUpdateContact(contactObj)){
+        updateContactsList();
+        clearInputs();
+        alert("New Contact created!");
+    }
+    
 }
 
 function updateContactsList(){
@@ -70,7 +87,7 @@ function updateContactsList(){
         // rows
         var i=1;
         updatedContacts.forEach(function(contact){
-            tbl.appendChild(createNewContactRow(i++,contact.val().name, contact.val().mobile));
+            tbl.appendChild(createNewContactRow(i++,contact.val()));
         });
     }
 
@@ -95,6 +112,12 @@ function alertOnUpdate(contacts){
 
 // --- Events ---
 
+btnLogin.onclick = function(){
+    if(txtPassword.value == "Welcome"){
+        document.getElementById("pwdBlock").style.display = "none";
+    }
+}
+
 document.getElementById("btnAdd").onclick = addContact;
 
 contactsRef.on('value', function(contacts){
@@ -105,9 +128,11 @@ lnkUpdate.onclick = function(){
     updateContactsList();
 }
 
-document.getElementById("btnDeleteAll").onclick = function(){
-    deleteAllContacts();
-}
+// document.getElementById("btnDeleteAll").onclick = function(){
+//     deleteAllContacts();
+// }
+
+
 
 // ----- basic methods ------
 
@@ -134,10 +159,14 @@ function createContactsHeaderRow(){
     td2.appendChild(document.createTextNode("Mobile No"));
     tr.appendChild(td2);
 
+    var td3= document.createElement("th");
+    td3.appendChild(document.createTextNode("Address"));
+    tr.appendChild(td3);
+
     return tr;
 }
 
-function createNewContactRow(sno,name,mobile){
+function createNewContactRow(sno,contact){
     var tr = document.createElement("tr");
 
     var td0 = document.createElement("td");
@@ -145,14 +174,21 @@ function createNewContactRow(sno,name,mobile){
     tr.appendChild(td0);
         
     var td1 = document.createElement("td");
-    td1.appendChild(document.createTextNode(name));
+    td1.appendChild(document.createTextNode(contact.name));
     tr.appendChild(td1);
 
     var td2= document.createElement("td");
-    td2.appendChild(document.createTextNode(mobile));
+    td2.appendChild(document.createTextNode(contact.mobile));
     tr.appendChild(td2);
+
+    var td3= document.createElement("td");
+    td3.appendChild(document.createTextNode(contact.address));
+    tr.appendChild(td3);
 
     return tr;
 }
 
+function checkEmptyString(str){
+    return str.toString().trim() == "";
+}
 
